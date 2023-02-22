@@ -3,7 +3,7 @@
 ## Installation
 
 - Ubuntu 22.04
-- Python 3.10
+- Python 3.10, 3.11
 - `pip install -r requirements.txt`
 
 PyMARL is [WhiRL](http://whirl.cs.ox.ac.uk)'s framework for deep multi-agent reinforcement learning and includes implementations of the following algorithms:
