@@ -1,22 +1,25 @@
 import datetime
 import os
 import pprint
-import time
 import threading
-import torch as th
+import time
+from os.path import abspath, dirname
 from types import SimpleNamespace as SN
-from utils.logging import Logger
-from utils.timehelper import time_left, time_str
-from os.path import dirname, abspath
+from typing import Any, Dict
 
-from learners import REGISTRY as le_REGISTRY
-from runners import REGISTRY as r_REGISTRY
-from controllers import REGISTRY as mac_REGISTRY
+import torch as th
+from sacred.run import Run
+
 from components.episode_buffer import ReplayBuffer
 from components.transforms import OneHot
+from controllers import REGISTRY as mac_REGISTRY
+from learners import REGISTRY as le_REGISTRY
+from runners import REGISTRY as r_REGISTRY
+from utils.logging import Logger
+from utils.timehelper import time_left, time_str
 
 
-def run(_run, _config, _log):
+def run(_run: Run, _config: Dict[str, Any], _log: Logger):
     # check args sanity
     _config = args_sanity_check(_config, _log)
 

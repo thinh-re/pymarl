@@ -1,7 +1,7 @@
 from collections import defaultdict
 import logging
 import numpy as np
-
+from logging import Logger
 
 class Logger:
     def __init__(self, console_logger):
@@ -56,7 +56,7 @@ class Logger:
 
 
 # set up a custom logger
-def get_logger():
+def get_logger() -> Logger:
     logger = logging.getLogger()
     logger.handlers = []
     ch = logging.StreamHandler()

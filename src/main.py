@@ -1,18 +1,21 @@
-from typing import Any, Dict
-import numpy as np
-import os
 import collections
-from os.path import dirname, abspath
+import os
+import sys
 from copy import deepcopy
-from sacred import Experiment, SETTINGS
+from logging import Logger
+from os.path import abspath, dirname
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import torch as th
+import yaml
+from sacred import SETTINGS, Experiment
 from sacred.observers import FileStorageObserver
 from sacred.utils import apply_backspaces_and_linefeeds
-import sys
-import torch as th
-from utils.logging import get_logger
-import yaml
+from sacred.run import Run
 
 from run import run
+from utils.logging import get_logger
 
 SETTINGS[
     "CAPTURE_MODE"
@@ -27,7 +30,7 @@ results_path = os.path.join(dirname(dirname(abspath(__file__))), "results")
 
 
 @ex.main
-def my_main(_run, _config, _log):
+def my_main(_run: Run, _config: Dict[str, Any], _log: Logger):
     # Setting the random seed throughout the modules
     config = config_copy(_config)
     np.random.seed(config["seed"])
@@ -38,8 +41,18 @@ def my_main(_run, _config, _log):
     run(_run, config, _log)
 
 
-def _get_config(params, arg_name, subfolder):
-    config_name = None
+def _get_config(params: List[str], arg_name: str, subfolder: str) -> Dict[str, Any]:
+    """Get config
+
+    Args:
+        params (List[str]): arguments
+        arg_name (str): argument "env_config"
+        subfolder (str): subfolder "envs"
+
+    Returns:
+        _type_: _description_
+    """
+    config_name: Optional[str] = None
     for _i, _v in enumerate(params):
         if _v.split("=")[0] == arg_name:
             config_name = _v.split("=")[1]
