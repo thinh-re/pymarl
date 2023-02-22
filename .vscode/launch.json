@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--config=qmix",
+                "--env-config=sc2",
+                "with",
+                "env_args.map_name=2s3z"
+            ],
+            "env": {
+                "SC2PATH": "~/StarCraftII"
+            }
+        },
+    ]
+}

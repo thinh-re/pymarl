@@ -1,10 +1,15 @@
+# Python MARL framework
+
+## Installation
+
+- Python 3.10
+- `pip install -r requirements.txt`
+
 ```diff
 - Please pay attention to the version of SC2 you are using for your experiments. 
 - Performance is *not* always comparable between versions. 
 - The results in SMAC (https://arxiv.org/abs/1902.04043) use SC2.4.6.2.69232 not SC2.4.10.
 ```
-
-# Python MARL framework
 
 PyMARL is [WhiRL](http://whirl.cs.ox.ac.uk)'s framework for deep multi-agent reinforcement learning and includes implementations of the following algorithms:
 - [**QMIX**: QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1803.11485)
