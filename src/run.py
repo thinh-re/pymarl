@@ -6,15 +6,16 @@ import time
 from logging import Logger as LoggerType
 from os.path import abspath, dirname
 from types import SimpleNamespace as SN
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import torch as th
 from sacred.run import Run
 
 from components.episode_buffer import ReplayBuffer
 from components.transforms import OneHot
-from controllers import REGISTRY as mac_REGISTRY
+from controllers.basic_controller import BasicMAC
 from learners import REGISTRY as le_REGISTRY
+from learners import COMALearner, QLearner, QTranLearner
 from runners import REGISTRY as r_REGISTRY
 from runners.episode_runner import EpisodeRunner
 from type_hint import ArgsType
@@ -117,13 +118,15 @@ def run_sequential(args: ArgsType, logger: Logger):
     )
 
     # Setup multiagent controller here
-    mac = mac_REGISTRY[args.mac](buffer.scheme, groups, args)
+    mac = BasicMAC(buffer.scheme, groups, args)
 
     # Give runner the scheme
     runner.setup(scheme=scheme, groups=groups, preprocess=preprocess, mac=mac)
 
     # Learner
-    learner = le_REGISTRY[args.learner](mac, buffer.scheme, logger, args)
+    learner: Union[QLearner, COMALearner, QTranLearner] = le_REGISTRY[args.learner](
+        mac, buffer.scheme, logger, args
+    )
 
     if args.use_cuda:
         learner.cuda()

@@ -8,9 +8,9 @@ import torch as th
 class EpisodeBatch:
     def __init__(
         self,
-        scheme,
-        groups,
-        batch_size,
+        scheme: Dict[str, Any],
+        groups: Dict[str, Any],
+        batch_size: int,
         max_seq_length,
         data=None,
         preprocess=None,

@@ -1,5 +1,6 @@
 import torch as th
 from torch.distributions import Categorical
+
 from .epsilon_schedules import DecayThenFlatSchedule
 
 REGISTRY = {}

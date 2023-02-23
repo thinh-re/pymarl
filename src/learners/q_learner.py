@@ -1,13 +1,21 @@
 import copy
-from components.episode_buffer import EpisodeBatch
-from modules.mixers.vdn import VDNMixer
-from modules.mixers.qmix import QMixer
+from typing import Any, Dict
+
 import torch as th
 from torch.optim import RMSprop
 
+from components.episode_buffer import EpisodeBatch
+from controllers.basic_controller import BasicMAC
+from modules.mixers.qmix import QMixer
+from modules.mixers.vdn import VDNMixer
+from type_hint import ArgsType
+from utils.logging import Logger
+
 
 class QLearner:
-    def __init__(self, mac, scheme, logger, args):
+    def __init__(
+        self, mac: BasicMAC, scheme: Dict[str, Any], logger: Logger, args: ArgsType
+    ):
         self.args = args
         self.mac = mac
         self.logger = logger

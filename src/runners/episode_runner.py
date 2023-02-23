@@ -2,8 +2,10 @@ from functools import partial
 from typing import Any, Dict
 
 import numpy as np
+from smac.env.starcraft2.starcraft2 import StarCraft2Env
 
 from components.episode_buffer import EpisodeBatch
+from controllers.basic_controller import BasicMAC
 from envs import REGISTRY as env_REGISTRY
 from type_hint import ArgsType
 from utils.logging import Logger
@@ -16,7 +18,7 @@ class EpisodeRunner:
         self.batch_size = self.args.batch_size_run
         assert self.batch_size == 1
 
-        self.env = env_REGISTRY[self.args.env](**self.args.env_args)
+        self.env: StarCraft2Env = env_REGISTRY[self.args.env](**self.args.env_args)
         self.episode_limit = self.env.episode_limit
         self.t = 0
 
@@ -30,7 +32,13 @@ class EpisodeRunner:
         # Log the first run
         self.log_train_stats_t = -1000000
 
-    def setup(self, scheme, groups, preprocess, mac):
+    def setup(
+        self,
+        scheme: Dict[str, Any],
+        groups: Dict[str, Any],
+        preprocess: Dict[str, Any],
+        mac: BasicMAC,
+    ):
         self.new_batch = partial(
             EpisodeBatch,
             scheme,

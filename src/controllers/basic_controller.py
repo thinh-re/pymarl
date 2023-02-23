@@ -1,11 +1,14 @@
-from modules.agents import REGISTRY as agent_REGISTRY
-from components.action_selectors import REGISTRY as action_REGISTRY
+from typing import Any, Dict
+
 import torch as th
 
+from components.action_selectors import REGISTRY as action_REGISTRY
+from modules.agents import REGISTRY as agent_REGISTRY
+from type_hint import ArgsType
 
 # This multi-agent controller shares parameters between agents
 class BasicMAC:
-    def __init__(self, scheme, groups, args):
+    def __init__(self, scheme: Dict[str, Any], groups: Dict[str, Any], args: ArgsType):
         self.n_agents = args.n_agents
         self.args = args
         input_shape = self._get_input_shape(scheme)
