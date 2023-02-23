@@ -1,10 +1,11 @@
-from collections import defaultdict
 import logging
+from collections import defaultdict
+
 import numpy as np
-from logging import Logger
+
 
 class Logger:
-    def __init__(self, console_logger):
+    def __init__(self, console_logger: logging.Logger):
         self.console_logger = console_logger
 
         self.use_tb = False
@@ -13,7 +14,7 @@ class Logger:
 
         self.stats = defaultdict(lambda: [])
 
-    def setup_tb(self, directory_name):
+    def setup_tb(self, directory_name: str):
         # Import here so it doesn't have to be installed if you don't use it
         from tensorboard_logger import configure, log_value
 
@@ -56,7 +57,7 @@ class Logger:
 
 
 # set up a custom logger
-def get_logger() -> Logger:
+def get_logger() -> logging.RootLogger:
     logger = logging.getLogger()
     logger.handlers = []
     ch = logging.StreamHandler()

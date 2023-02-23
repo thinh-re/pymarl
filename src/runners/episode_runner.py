@@ -1,11 +1,16 @@
-from envs import REGISTRY as env_REGISTRY
 from functools import partial
-from components.episode_buffer import EpisodeBatch
+from typing import Any, Dict
+
 import numpy as np
+
+from components.episode_buffer import EpisodeBatch
+from envs import REGISTRY as env_REGISTRY
+from type_hint import ArgsType
+from utils.logging import Logger
 
 
 class EpisodeRunner:
-    def __init__(self, args, logger):
+    def __init__(self, args: ArgsType, logger: Logger):
         self.args = args
         self.logger = logger
         self.batch_size = self.args.batch_size_run
@@ -37,7 +42,7 @@ class EpisodeRunner:
         )
         self.mac = mac
 
-    def get_env_info(self):
+    def get_env_info(self) -> Dict[str, Any]:
         return self.env.get_env_info()
 
     def save_replay(self):

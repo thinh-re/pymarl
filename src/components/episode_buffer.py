@@ -1,6 +1,8 @@
-import torch as th
-import numpy as np
 from types import SimpleNamespace as SN
+from typing import Any, Dict
+
+import numpy as np
+import torch as th
 
 
 class EpisodeBatch:
@@ -106,7 +108,9 @@ class EpisodeBatch:
             self.data.episode_data[k] = v.to(device)
         self.device = device
 
-    def update(self, data, bs=slice(None), ts=slice(None), mark_filled=True):
+    def update(
+        self, data: Dict[str, Any], bs=slice(None), ts=slice(None), mark_filled=True
+    ):
         slices = self._parse_slices((bs, ts))
         for k, v in data.items():
             if k in self.data.transition_data:
@@ -122,7 +126,7 @@ class EpisodeBatch:
                 raise KeyError("{} not found in transition or episode data".format(k))
 
             dtype = self.scheme[k].get("dtype", th.float32)
-            v = th.tensor(v, dtype=dtype, device=self.device)
+            v = th.tensor(np.array(v), dtype=dtype, device=self.device)
             self._check_safe_view(v, target[k][_slices])
             target[k][_slices] = v.view_as(target[k][_slices])
 

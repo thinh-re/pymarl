@@ -3,6 +3,7 @@ import os
 import pprint
 import threading
 import time
+from logging import Logger as LoggerType
 from os.path import abspath, dirname
 from types import SimpleNamespace as SN
 from typing import Any, Dict
@@ -15,15 +16,18 @@ from components.transforms import OneHot
 from controllers import REGISTRY as mac_REGISTRY
 from learners import REGISTRY as le_REGISTRY
 from runners import REGISTRY as r_REGISTRY
+from runners.episode_runner import EpisodeRunner
+from type_hint import ArgsType
 from utils.logging import Logger
 from utils.timehelper import time_left, time_str
 
 
-def run(_run: Run, _config: Dict[str, Any], _log: Logger):
+def run(_run: Run, _config: Dict[str, Any], _log: LoggerType):
     # check args sanity
     _config = args_sanity_check(_config, _log)
 
-    args = SN(**_config)
+    args: ArgsType = SN(**_config)
+    # args = CfgData.from_dict(_config)
     args.device = "cuda" if args.use_cuda else "cpu"
 
     # setup loggers
@@ -67,7 +71,7 @@ def run(_run: Run, _config: Dict[str, Any], _log: Logger):
     os._exit(os.EX_OK)
 
 
-def evaluate_sequential(args, runner):
+def evaluate_sequential(args: ArgsType, runner):
     for _ in range(args.test_nepisode):
         runner.run(test_mode=True)
 
@@ -77,9 +81,9 @@ def evaluate_sequential(args, runner):
     runner.close_env()
 
 
-def run_sequential(args, logger):
+def run_sequential(args: ArgsType, logger: Logger):
     # Init runner so we can get env info
-    runner = r_REGISTRY[args.runner](args=args, logger=logger)
+    runner: EpisodeRunner = r_REGISTRY[args.runner](args=args, logger=logger)
 
     # Set up schemes and groups here
     env_info = runner.get_env_info()
@@ -231,7 +235,7 @@ def run_sequential(args, logger):
     logger.console_logger.info("Finished Training")
 
 
-def args_sanity_check(config, _log):
+def args_sanity_check(config: Dict[str, Any], _log: Logger) -> Dict[str, Any]:
     # set CUDA flags
     # config["use_cuda"] = True # Use cuda whenever possible!
     if config["use_cuda"] and not th.cuda.is_available():

@@ -4,17 +4,18 @@ import sys
 from copy import deepcopy
 from logging import Logger
 from os.path import abspath, dirname
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import torch as th
 import yaml
 from sacred import SETTINGS, Experiment
 from sacred.observers import FileStorageObserver
-from sacred.utils import apply_backspaces_and_linefeeds
 from sacred.run import Run
+from sacred.utils import apply_backspaces_and_linefeeds
 
 from run import run
+from type_hint import ArgsType
 from utils.logging import get_logger
 
 SETTINGS[
@@ -85,7 +86,7 @@ def recursive_dict_update(d: Dict[str, Any], u: Dict[str, Any]) -> Dict[str, Any
     return d
 
 
-def config_copy(config):
+def config_copy(config: Union[Dict, List]) -> Union[Dict, List]:
     if isinstance(config, dict):
         return {k: config_copy(v) for k, v in config.items()}
     elif isinstance(config, list):
