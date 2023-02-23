@@ -17,7 +17,7 @@ from controllers.basic_controller import BasicMAC
 from learners import REGISTRY as le_REGISTRY
 from learners import COMALearner, QLearner, QTranLearner
 from runners import REGISTRY as r_REGISTRY
-from runners.episode_runner import EpisodeRunner
+from runners import EpisodeRunner, ParallelRunner
 from type_hint import ArgsType
 from utils.logging import Logger
 from utils.timehelper import time_left, time_str
@@ -84,7 +84,7 @@ def evaluate_sequential(args: ArgsType, runner):
 
 def run_sequential(args: ArgsType, logger: Logger):
     # Init runner so we can get env info
-    runner: EpisodeRunner = r_REGISTRY[args.runner](args=args, logger=logger)
+    runner: Union[EpisodeRunner, ParallelRunner] = r_REGISTRY[args.runner](args=args, logger=logger)
 
     # Set up schemes and groups here
     env_info = runner.get_env_info()

@@ -1,15 +1,18 @@
-from envs import REGISTRY as env_REGISTRY
 from functools import partial
-from components.episode_buffer import EpisodeBatch
 from multiprocessing import Pipe, Process
+
 import numpy as np
-import torch as th
+
+from components.episode_buffer import EpisodeBatch
+from envs import REGISTRY as env_REGISTRY
+from type_hint import ArgsType
+from utils.logging import Logger
 
 
 # Based (very) heavily on SubprocVecEnv from OpenAI Baselines
 # https://github.com/openai/baselines/blob/master/baselines/common/vec_env/subproc_vec_env.py
 class ParallelRunner:
-    def __init__(self, args, logger):
+    def __init__(self, args: ArgsType, logger: Logger):
         self.args = args
         self.logger = logger
         self.batch_size = self.args.batch_size_run

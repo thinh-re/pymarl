@@ -3,15 +3,18 @@ from typing import Any, Dict
 import torch as th
 
 from components.action_selectors import REGISTRY as action_REGISTRY
+from components.episode_buffer import EpisodeBatch
 from modules.agents import REGISTRY as agent_REGISTRY
+from modules.agents.rnn_agent import RNNAgent
 from type_hint import ArgsType
+
 
 # This multi-agent controller shares parameters between agents
 class BasicMAC:
     def __init__(self, scheme: Dict[str, Any], groups: Dict[str, Any], args: ArgsType):
         self.n_agents = args.n_agents
         self.args = args
-        input_shape = self._get_input_shape(scheme)
+        input_shape: int = self._get_input_shape(scheme)
         self._build_agents(input_shape)
         self.agent_output_type = args.agent_output_type
 
@@ -28,7 +31,7 @@ class BasicMAC:
         )
         return chosen_actions
 
-    def forward(self, ep_batch, t, test_mode=False):
+    def forward(self, ep_batch: EpisodeBatch, t, test_mode=False):
         agent_inputs = self._build_inputs(ep_batch, t)
         avail_actions = ep_batch["avail_actions"][:, t]
         agent_outs, self.hidden_states = self.agent(agent_inputs, self.hidden_states)
@@ -78,7 +81,7 @@ class BasicMAC:
     def cuda(self):
         self.agent.cuda()
 
-    def save_models(self, path):
+    def save_models(self, path: str):
         th.save(self.agent.state_dict(), "{}/agent.th".format(path))
 
     def load_models(self, path):
@@ -88,8 +91,8 @@ class BasicMAC:
             )
         )
 
-    def _build_agents(self, input_shape):
-        self.agent = agent_REGISTRY[self.args.agent](input_shape, self.args)
+    def _build_agents(self, input_shape: int):
+        self.agent: RNNAgent = agent_REGISTRY[self.args.agent](input_shape, self.args)
 
     def _build_inputs(self, batch, t):
         # Assumes homogenous agents with flat observations.
@@ -112,7 +115,7 @@ class BasicMAC:
         inputs = th.cat([x.reshape(bs * self.n_agents, -1) for x in inputs], dim=1)
         return inputs
 
-    def _get_input_shape(self, scheme):
+    def _get_input_shape(self, scheme: Dict[str, Any]):
         input_shape = scheme["obs"]["vshape"]
         if self.args.obs_last_action:
             input_shape += scheme["actions_onehot"]["vshape"][0]
