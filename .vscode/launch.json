@@ -21,5 +21,17 @@
                 "SC2PATH": "~/StarCraftII"
             }
         },
+        {
+            "name": "Example",
+            "type": "python",
+            "request": "launch",
+            "program": "random_example.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [],
+            "env": {
+                "SC2PATH": "~/StarCraftII"
+            }
+        },
     ]
 }

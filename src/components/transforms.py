@@ -1,4 +1,5 @@
 import torch as th
+from torch import Tensor
 
 
 class Transform:
@@ -10,10 +11,10 @@ class Transform:
 
 
 class OneHot(Transform):
-    def __init__(self, out_dim):
+    def __init__(self, out_dim: int):
         self.out_dim = out_dim
 
-    def transform(self, tensor):
+    def transform(self, tensor: Tensor):
         y_onehot = tensor.new(*tensor.shape[:-1], self.out_dim).zero_()
         y_onehot.scatter_(-1, tensor.long(), 1)
         return y_onehot.float()

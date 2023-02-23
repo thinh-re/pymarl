@@ -22,7 +22,14 @@ class BasicMAC:
 
         self.hidden_states = None
 
-    def select_actions(self, ep_batch, t_ep, t_env, bs=slice(None), test_mode=False):
+    def select_actions(
+        self,
+        ep_batch: EpisodeBatch,
+        t_ep: int,
+        t_env: int,
+        bs=slice(None),
+        test_mode=False,
+    ):
         # Only select actions for the selected batch elements in bs
         avail_actions = ep_batch["avail_actions"][:, t_ep]
         agent_outputs = self.forward(ep_batch, t_ep, test_mode=test_mode)
@@ -31,7 +38,7 @@ class BasicMAC:
         )
         return chosen_actions
 
-    def forward(self, ep_batch: EpisodeBatch, t, test_mode=False):
+    def forward(self, ep_batch: EpisodeBatch, t: int, test_mode=False) -> th.Tensor:
         agent_inputs = self._build_inputs(ep_batch, t)
         avail_actions = ep_batch["avail_actions"][:, t]
         agent_outs, self.hidden_states = self.agent(agent_inputs, self.hidden_states)
@@ -67,7 +74,7 @@ class BasicMAC:
 
         return agent_outs.view(ep_batch.batch_size, self.n_agents, -1)
 
-    def init_hidden(self, batch_size):
+    def init_hidden(self, batch_size: int) -> None:
         self.hidden_states = (
             self.agent.init_hidden().unsqueeze(0).expand(batch_size, self.n_agents, -1)
         )  # bav
@@ -75,16 +82,16 @@ class BasicMAC:
     def parameters(self):
         return self.agent.parameters()
 
-    def load_state(self, other_mac):
+    def load_state(self, other_mac) -> None:
         self.agent.load_state_dict(other_mac.agent.state_dict())
 
-    def cuda(self):
+    def cuda(self) -> None:
         self.agent.cuda()
 
     def save_models(self, path: str):
         th.save(self.agent.state_dict(), "{}/agent.th".format(path))
 
-    def load_models(self, path):
+    def load_models(self, path: str):
         self.agent.load_state_dict(
             th.load(
                 "{}/agent.th".format(path), map_location=lambda storage, loc: storage

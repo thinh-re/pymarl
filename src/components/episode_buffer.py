@@ -1,8 +1,16 @@
 from types import SimpleNamespace as SN
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch as th
+from torch import Tensor
+from components.transforms import Transform
+
+
+class EpisodeBatchData:
+    def __init__(self) -> None:
+        self.transition_data: Dict[str, Tensor] = {}
+        self.episode_data: Dict[str, Tensor] = {}
 
 
 class EpisodeBatch:
@@ -12,8 +20,8 @@ class EpisodeBatch:
         groups: Dict[str, Any],
         batch_size: int,
         max_seq_length,
-        data=None,
-        preprocess=None,
+        data: Optional[EpisodeBatchData] = None,
+        preprocess: Optional[Dict[str, Tuple[str, Transform]]] = None,
         device="cpu",
     ):
         self.scheme = scheme.copy()
@@ -26,14 +34,19 @@ class EpisodeBatch:
         if data is not None:
             self.data = data
         else:
-            self.data = SN()
-            self.data.transition_data = {}
-            self.data.episode_data = {}
+            self.data = EpisodeBatchData()
             self._setup_data(
                 self.scheme, self.groups, batch_size, max_seq_length, self.preprocess
             )
 
-    def _setup_data(self, scheme, groups, batch_size, max_seq_length, preprocess):
+    def _setup_data(
+        self,
+        scheme: Dict[str, Any],
+        groups: Dict[str, Any],
+        batch_size: int,
+        max_seq_length: int,
+        preprocess: Dict[str, Any],
+    ):
         if preprocess is not None:
             for k in preprocess:
                 assert k in scheme
@@ -93,7 +106,7 @@ class EpisodeBatch:
                     device=self.device,
                 )
 
-    def extend(self, scheme, groups=None):
+    def extend(self, scheme: Dict[str, Any], groups: Optional[Dict[str, Any]] = None):
         self._setup_data(
             scheme,
             self.groups if groups is None else groups,
@@ -101,7 +114,7 @@ class EpisodeBatch:
             self.max_seq_length,
         )
 
-    def to(self, device):
+    def to(self, device: str) -> None:
         for k, v in self.data.transition_data.items():
             self.data.transition_data[k] = v.to(device)
         for k, v in self.data.episode_data.items():
@@ -211,10 +224,7 @@ class EpisodeBatch:
             return 1 + (_range[1] - _range[0] - 1) // _range[2]
 
     def _new_data_sn(self):
-        new_data = SN()
-        new_data.transition_data = {}
-        new_data.episode_data = {}
-        return new_data
+        return EpisodeBatchData()
 
     def _parse_slices(self, items):
         parsed = []
@@ -253,7 +263,13 @@ class EpisodeBatch:
 
 class ReplayBuffer(EpisodeBatch):
     def __init__(
-        self, scheme, groups, buffer_size, max_seq_length, preprocess=None, device="cpu"
+        self,
+        scheme: Dict[str, Any],
+        groups: Dict[str, Any],
+        buffer_size: int,
+        max_seq_length: int,
+        preprocess: Optional[Dict[str, Tuple[str, Transform]]] = None,
+        device="cpu",
     ):
         super(ReplayBuffer, self).__init__(
             scheme,
@@ -267,7 +283,7 @@ class ReplayBuffer(EpisodeBatch):
         self.buffer_index = 0
         self.episodes_in_buffer = 0
 
-    def insert_episode_batch(self, ep_batch):
+    def insert_episode_batch(self, ep_batch: EpisodeBatch):
         if self.buffer_index + ep_batch.batch_size <= self.buffer_size:
             self.update(
                 ep_batch.data.transition_data,
@@ -288,10 +304,10 @@ class ReplayBuffer(EpisodeBatch):
             self.insert_episode_batch(ep_batch[0:buffer_left, :])
             self.insert_episode_batch(ep_batch[buffer_left:, :])
 
-    def can_sample(self, batch_size):
+    def can_sample(self, batch_size: int):
         return self.episodes_in_buffer >= batch_size
 
-    def sample(self, batch_size):
+    def sample(self, batch_size: int):
         assert self.can_sample(batch_size)
         if self.episodes_in_buffer == batch_size:
             return self[:batch_size]
