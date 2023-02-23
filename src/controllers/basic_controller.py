@@ -11,7 +11,9 @@ from type_hint import ArgsType
 
 # This multi-agent controller shares parameters between agents
 class BasicMAC:
-    def __init__(self, scheme: Dict[str, Any], groups: Dict[str, Any], args: ArgsType):
+    def __init__(
+        self, scheme: Dict[str, Any], groups: Dict[str, Any], args: ArgsType
+    ) -> None:
         self.n_agents = args.n_agents
         self.args = args
         input_shape: int = self._get_input_shape(scheme)

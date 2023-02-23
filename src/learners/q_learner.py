@@ -2,6 +2,7 @@ import copy
 from typing import Any, Dict
 
 import torch as th
+from torch import Tensor
 from torch.optim import RMSprop
 
 from components.episode_buffer import EpisodeBatch
@@ -15,7 +16,7 @@ from utils.logging import Logger
 class QLearner:
     def __init__(
         self, mac: BasicMAC, scheme: Dict[str, Any], logger: Logger, args: ArgsType
-    ):
+    ) -> None:
         self.args = args
         self.mac = mac
         self.logger = logger
@@ -62,7 +63,7 @@ class QLearner:
         mac_out = th.stack(mac_out, dim=1)  # Concat over time
 
         # Pick the Q-Values for the actions taken by each agent
-        chosen_action_qvals = th.gather(mac_out[:, :-1], dim=3, index=actions).squeeze(
+        chosen_action_qvals: Tensor = th.gather(mac_out[:, :-1], dim=3, index=actions).squeeze(
             3
         )  # Remove the last dim
 
@@ -91,10 +92,10 @@ class QLearner:
 
         # Mix
         if self.mixer is not None:
-            chosen_action_qvals = self.mixer(
+            chosen_action_qvals: Tensor = self.mixer(
                 chosen_action_qvals, batch["state"][:, :-1]
             )
-            target_max_qvals = self.target_mixer(
+            target_max_qvals: Tensor = self.target_mixer(
                 target_max_qvals, batch["state"][:, 1:]
             )
 

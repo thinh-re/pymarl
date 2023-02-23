@@ -1,13 +1,15 @@
 import torch as th
 from torch.distributions import Categorical
 
+from type_hint import ArgsType
+
 from .epsilon_schedules import DecayThenFlatSchedule
 
 REGISTRY = {}
 
 
 class MultinomialActionSelector:
-    def __init__(self, args):
+    def __init__(self, args: ArgsType):
         self.args = args
 
         self.schedule = DecayThenFlatSchedule(
@@ -37,7 +39,7 @@ REGISTRY["multinomial"] = MultinomialActionSelector
 
 
 class EpsilonGreedyActionSelector:
-    def __init__(self, args):
+    def __init__(self, args: ArgsType):
         self.args = args
 
         self.schedule = DecayThenFlatSchedule(
